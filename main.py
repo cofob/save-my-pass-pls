@@ -1,22 +1,26 @@
+#!/bin/python3
 import os
 import secrets
-import pickle
 from Crypto.Cipher import AES
 from getpass import getpass
 from pbkdf2 import PBKDF2
 import toml
 from base64 import b64encode, b64decode
 import models
-from sys import argv
+import argparse
 
-
-try:
-    db_name = argv[1]
-except IndexError:
-    db_name = 'main'
+parser = argparse.ArgumentParser(description='CLI password manager')
+parser.add_argument('--db', default='main', type=str, help='Database name (default: main)')
+parser.add_argument('action', type=str, help='Action (show_categories, show_entry, '
+                                             'rm_category, rm_entry, create_entry, create_category)')
+parser.add_argument('--category', '-c', default='__global__', type=str, help='Category')
+parser.add_argument('--name', '-n', default=None, type=str, help='Entry name')
+parser.add_argument('--type', '-t', default='0', type=str, help='Record type name')
+parser.add_argument('--value', '-v', default=None, type=str, help='Record value name')
+args = parser.parse_args()
 
 base_path = os.path.join(os.getenv('HOME', ''), '.smpp')
-base_path = os.path.join(base_path, db_name)
+base_path = os.path.join(base_path, args.db)
 
 if not os.path.isdir(base_path):
     os.mkdir(base_path)
@@ -70,3 +74,35 @@ del nonce, tag, ciphertext
 save_config()
 
 db = models.Database(base_path, password)
+
+
+if args.action == 'show_categories':
+    for c in db.categories:
+        print('category:', c.name)
+elif args.action == 'show_entries':
+    for c in db.categories:
+        if c.name == args.category:
+            print('category:', args.category)
+            for e in c.entries:
+                print('\tname:', e.name)
+                for r in e.records:
+                    print('\t\ttype:', r.type)
+                    print('\t\tvalue:', r.value)
+                    print()
+elif args.action == 'create_entry':
+    db.create_entry(args.category, args.name, [{'type': args.type, 'value': args.value}])
+elif args.action == 'create_category':
+    db.create_category(args.name)
+elif args.action == 'rm_entry':
+    for c in db.categories:
+        if c.name == args.category:
+            for e in c.entries:
+                if e.name == args.name:
+                    db.delete_entry(c, e)
+                    break
+            break
+elif args.action == 'rm_category':
+    for c in db.categories:
+        if c.name == args.category:
+            db.delete_category(c)
+            break

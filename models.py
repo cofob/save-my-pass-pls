@@ -93,6 +93,7 @@ class Database:
                 for re in data['records']:
                     r.append(Record(re['type'], re['value']))
                 e = Entry(data['name'], r, e)
+                category.add_entries(e)
 
     def load(self):
         self.categories = []
