@@ -22,6 +22,7 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
+        sudo apt-get install wine -y
         sudo apt install zip unzip -y
         pip install pyinstaller
         python -m pip install --upgrade pip
@@ -60,11 +61,16 @@ jobs:
           This is an automatic release
         draft: false
         prerelease: true
-    - name: PyInstaller Linux
+    - name: PyInstaller
       run: |
+        # linux
         pyinstaller main.py --nowindow --onefile
         mv dist/main main
         zip linux.zip main
+        # windows
+        wget https://www.python.org/ftp/python/3.9.5/python-3.9.5-embed-amd64.zip -o python.zip
+        unzip python.zip
+        ls
     - name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
