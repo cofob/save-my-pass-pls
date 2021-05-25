@@ -34,11 +34,6 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
-    - name: Apply Black code style
-      run: |
-        black *.py
-        git config --global user.email "black@example.com"
-        git config --global user.name "Black"
-        git add .
-        git commit -m "Black reformat"
-        git push
+    - uses: weibullguy/python-lint-plus@master
+      with:
+        use-black: true
