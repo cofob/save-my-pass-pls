@@ -36,6 +36,8 @@ jobs:
         black .
     - name: Commit files
       run: |
+        openssl rand 64 | base64 > .null
+        rm -rf .idea
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git commit -m "Aplied Black code style" -a
