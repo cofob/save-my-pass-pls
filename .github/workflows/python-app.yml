@@ -68,8 +68,9 @@ jobs:
         mv dist/main main
         zip linux.zip main
         # windows
-        wget https://www.python.org/ftp/python/3.9.5/python-3.9.5-embed-amd64.zip -o python.zip
-        unzip python.zip
+        wget https://www.python.org/ftp/python/3.9.5/python-3.9.5-embed-amd64.zip
+        ls
+        unzip python-3.9.5-embed-amd64.zip -d python
         ls
     - name: Upload Release Asset
       id: upload-release-asset
