@@ -13,10 +13,12 @@ parser = argparse.ArgumentParser(description="CLI password manager")
 parser.add_argument(
     "--db", default="main", type=str, help="Database name (default: main)"
 )
-parser.add_argument("action",
+parser.add_argument(
+    "action",
     type=str,
     help="Action (show_categories, show_entry, "
-    "rm_category, rm_entry, create_entry, create_category)",)
+    "rm_category, rm_entry, create_entry, create_category)",
+)
 parser.add_argument("--category", "-c", default="__global__", type=str, help="Category")
 parser.add_argument("--name", "-n", default=None, type=str, help="Entry name")
 parser.add_argument("--type", "-t", default="0", type=str, help="Record type name")
