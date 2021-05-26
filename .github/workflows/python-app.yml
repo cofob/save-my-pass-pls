@@ -10,8 +10,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,11 +21,8 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
-        # sudo apt-get install wine -y
-        sudo apt install zip unzip -y
-        pip install pyinstaller
         python -m pip install --upgrade pip
-        pip install flake8 pytest black
+        pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
@@ -34,13 +30,26 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+  
+  apply-style:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install black
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Apply Black code style
       run: |
         black .
     - name: Commit files
       run: |
-        openssl rand 64 | base64 > .null
-        rm -rf .idea
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git commit -m "Aplied Black code style" -a
@@ -49,6 +58,22 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ github.ref }}
+  
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        sudo apt install zip unzip -y
+        pip install pyinstaller
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -63,13 +88,6 @@ jobs:
         prerelease: true
     - name: PyInstaller
       run: |
-        # windows
-        # wget https://www.python.org/ftp/python/3.9.5/python-3.9.5-embed-amd64.zip
-        # unzip python-3.9.5-embed-amd64.zip -d python
-        # curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-        # wine python/python.exe get-pip.py
-        # wine python/Scripts/pip.exe install pyinstaller
-        # linux
         pyinstaller main.py --nowindow --onefile
         mv dist/main main
         zip linux.zip main
