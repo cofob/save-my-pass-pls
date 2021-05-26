@@ -22,7 +22,7 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
-        sudo apt-get install wine -y
+        # sudo apt-get install wine -y
         sudo apt install zip unzip -y
         pip install pyinstaller
         python -m pip install --upgrade pip
